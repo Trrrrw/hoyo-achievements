@@ -1,5 +1,7 @@
 # 米游成就
 
+[访问网站](https://ach.trrw.cn) · [源码仓库](https://github.com/Trrrrw/hoyo-achievements)
+
 原神、崩坏：星穹铁道、绝区零成就管理网站，使用 React、Vite 与自定义的冒险手册界面
 
 游戏目录只从 Akasha 读取，不直接访问其他游戏数据来源。个人完成状态和日期保存在当前浏览器，支持 JSON 导入导出与 WebDAV 同步，不需要网站账号
@@ -67,3 +69,9 @@ bun run build
 4. 配置支持跨域的 WebDAV，在两台设备分别修改不同成就后同步，确认合并结果
 
 提交、推送和发布前先完成本地验收
+
+## 部署
+
+EdgeOne Makers 项目 `hoyo-achievements` 关联本仓库的 `main` 分支，推送后自动部署到 `ach.trrw.cn`。构建预设为 Vite，安装命令为 `bun install`，构建命令为 `bun run build`，输出目录为 `dist`
+
+部署使用公开 Akasha API；浏览器中的个人进度不会随部署迁移。从本地预览迁移到正式域名时，可先导出全部游戏备份，再在正式网站导入
