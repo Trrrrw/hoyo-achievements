@@ -12,12 +12,15 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [24.18.0, 26.12.1]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-node@v7.1.0
         with:
-          node-version: 26.12.1
+          node-version: ${{ matrix.node }}
       - uses: oven-sh/setup-bun@v2.2.0
         with:
           bun-version: 1.4.3
