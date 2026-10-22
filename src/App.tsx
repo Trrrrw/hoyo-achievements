@@ -1,3 +1,5 @@
+import { usePwa } from "./Pwa";
+import { ExtraSync } from "./ExtraSync";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon, Overlay } from "./ui";
 import { getCatalog } from "./api";
@@ -35,6 +37,10 @@ function initialDav(): DavSettings {
   }
 }
 export default function App() {
+  const pwa = usePwa();
+  const [syncChannel, setSyncChannel] = useState<"webdav" | "gist" | "file">(
+    "webdav",
+  );
   const [notice, setNotice] = useState("");
   const [exportOpen, setExportOpen] = useState(false);
   const [exportFormat, setExportFormat] = useState<"backup" | "uiaf">("uiaf");
@@ -245,7 +251,7 @@ export default function App() {
       <header className="site-header">
         <a className="brand" href="/" aria-label="米游成就首页">
           <span className="brand-mark">
-            <Icon name="star" size={23} />
+            <img src="/favicon.svg" alt="" width="32" height="32" />
           </span>
           <span>
             米游成就<span className="brand-subtitle">每一份探索，都有回响</span>
@@ -461,6 +467,15 @@ export default function App() {
               </span>
               <span>奖励 / {rewardName}</span>
             </div>
+            {catalog?.offline && (
+              <div className="offline-notice" role="status">
+                正在使用离线目录 · 保存于{" "}
+                {catalog.savedAt
+                  ? new Date(catalog.savedAt).toLocaleDateString()
+                  : "上次访问"}
+                ，进度仍保存在本机
+              </div>
+            )}
             {error ? (
               <div className="empty-state" role="alert">
                 <Icon name="sync" size={30} />
@@ -600,14 +615,16 @@ export default function App() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Icon name="search" size={16} />米游社搜索
+              <Icon name="search" size={16} />
+              米游社搜索
             </a>
             <a
               href={achievementSearchLinks(game, selected.name).bilibili}
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Icon name="search" size={16} />哔哩哔哩搜索
+              <Icon name="search" size={16} />
+              哔哩哔哩搜索
             </a>
           </nav>
           <div className="detail-reward">
@@ -677,77 +694,113 @@ export default function App() {
             </div>
           )}
           <p className="settings-intro">将探索进度带到另一台设备</p>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              saveSettings();
-            }}
-          >
-            <label className="form-field">
-              WebDAV 进度文件地址
-              <input
-                type="url"
-                placeholder="https://dav.example.com/hoyo-achievements.json"
-                value={draftDav.url}
-                onChange={(e) =>
-                  setDraftDav({ ...draftDav, url: e.target.value })
-                }
-              />
-            </label>
-            <label className="form-field">
-              用户名
-              <input
-                autoComplete="off"
-                value={draftDav.username}
-                onChange={(e) =>
-                  setDraftDav({ ...draftDav, username: e.target.value })
-                }
-              />
-            </label>
-            <label className="form-field">
-              密码
-              <input
-                type="password"
-                autoComplete="off"
-                value={draftDav.password}
-                onChange={(e) =>
-                  setDraftDav({ ...draftDav, password: e.target.value })
-                }
-              />
-            </label>
-            <p className="field-help">密码仅在当前页面保留，刷新后需重新填写</p>
-            <details className="sync-help">
-              <summary>同步服务要求</summary>
-              <p>
-                请先创建文件所在目录。服务需允许本站跨域 GET /
-                PUT、Authorization、If-Match、If-None-Match，并暴露
-                ETag。同步只包含个人成就进度，不包含 WebDAV 凭据。
-              </p>
-            </details>
-            <div className="settings-actions">
+          <div className="sync-channel" role="tablist" aria-label="同步渠道">
+            {(
+              [
+                ["webdav", "WebDAV"],
+                ["gist", "GitHub Gist"],
+                ["file", "本地文件"],
+              ] as const
+            ).map(([value, label]) => (
               <button
-                type="button"
-                className="secondary-button"
-                onClick={() => setSettingsOpen(false)}
+                key={value}
+                role="tab"
+                aria-selected={syncChannel === value}
+                onClick={() => setSyncChannel(value)}
               >
-                取消
+                {label}
               </button>
-              <button className="primary-button" type="submit">
-                保存设置
-              </button>
-            </div>
-          </form>
-          <div className="sync-now">
-            <span>{dav.url ? "已配置同步地址" : "保存地址后可同步进度"}</span>
-            <button
-              className="secondary-button"
-              onClick={synchronize}
-              disabled={!dav.url || syncing || !!storageError}
-            >
-              <Icon name="sync" size={17} />
-              {syncing ? "正在同步…" : "立即同步"}
-            </button>
+            ))}
           </div>
+          {syncChannel === "webdav" ? (
+            <div role="tabpanel">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  saveSettings();
+                }}
+              >
+                <label className="form-field">
+                  WebDAV 进度文件地址
+                  <input
+                    type="url"
+                    placeholder="https://dav.example.com/hoyo-achievements.json"
+                    value={draftDav.url}
+                    onChange={(e) =>
+                      setDraftDav({ ...draftDav, url: e.target.value })
+                    }
+                  />
+                </label>
+                <label className="form-field">
+                  用户名
+                  <input
+                    autoComplete="off"
+                    value={draftDav.username}
+                    onChange={(e) =>
+                      setDraftDav({ ...draftDav, username: e.target.value })
+                    }
+                  />
+                </label>
+                <label className="form-field">
+                  密码
+                  <input
+                    type="password"
+                    autoComplete="off"
+                    value={draftDav.password}
+                    onChange={(e) =>
+                      setDraftDav({ ...draftDav, password: e.target.value })
+                    }
+                  />
+                </label>
+                <p className="field-help">
+                  密码仅在当前页面保留，刷新后需重新填写
+                </p>
+                <details className="sync-help">
+                  <summary>同步服务要求</summary>
+                  <p>
+                    请先创建文件所在目录。服务需允许本站跨域 GET /
+                    PUT、Authorization、Content-Type、If-Match、If-None-Match，并暴露
+                    ETag。同步只包含个人成就进度，不包含 WebDAV 凭据。
+                  </p>
+                </details>
+                <div className="settings-actions">
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() => setSettingsOpen(false)}
+                  >
+                    取消
+                  </button>
+                  <button className="primary-button" type="submit">
+                    保存设置
+                  </button>
+                </div>
+              </form>
+              <div className="sync-now">
+                <span>
+                  {dav.url ? "已配置同步地址" : "保存地址后可同步进度"}
+                </span>
+                <button
+                  className="secondary-button"
+                  onClick={synchronize}
+                  disabled={!dav.url || syncing || !!storageError}
+                >
+                  <Icon name="sync" size={17} />
+                  {syncing ? "正在同步…" : "立即同步"}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <ExtraSync
+              key={syncChannel}
+              channel={syncChannel}
+              current={current}
+              apply={apply}
+              disabled={!!storageError || syncing}
+              notify={setNotice}
+            />
+          )}
+          {pwa}
         </Overlay>
       )}
       {exportOpen && (
