@@ -13,5 +13,5 @@
 - `src/offline-catalog.ts` 负责已验证目录的 IndexedDB 缓存，只在网络失败时回退，数据校验失败不得用缓存掩盖
 - `src/gist.ts` 与 `src/file-sync.ts` 分别处理 Gist 和本地文件同步；Gist Token 仅在弹窗内存中使用，不进入进度文件或 Akasha 请求
 - `src/Pwa.tsx` 与 `scripts/build-pwa.mjs` 负责 PWA，Service Worker 仅缓存本站静态资源，不缓存 API、授权请求或跨域数据；更新由用户点击后生效
-- Bun 版本见 `package.json` 的 `packageManager`，构建脚本所用 Node.js 版本见 `.nvmrc`；冻结安装后运行测试与构建
+- Bun 版本见 `package.json` 的 `packageManager`，构建脚本所用 本机使用 nvm 默认 Node.js，云端构建版本见 `edgeone.json`；冻结安装后运行测试与构建
 - 文本统一使用 LF 换行，遵循 `.gitattributes`
