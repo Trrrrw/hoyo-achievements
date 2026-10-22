@@ -1430,3 +1430,52 @@ h1 {
   margin-top: 12px;
   line-height: 1.8;
 }
+
+.pwa-settings {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f1;
+}
+.pwa-settings .field-help {
+  flex-basis: 100%;
+  margin: 0;
+}
+.offline-notice {
+  color: #80714f;
+  margin: 0 0 14px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.sync-channel {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.sync-channel button {
+  font: inherit;
+  font-size: 13px;
+  padding: 8px 14px;
+  border: 1px solid #d6cfbe;
+  border-radius: 6px;
+  background: transparent;
+  color: #536073;
+  cursor: pointer;
+}
+.sync-channel button[aria-selected="true"] {
+  background: #203451;
+  color: #fff5d8;
+  border-color: #203451;
+}
+.brand-mark img {
+  display: block;
+  border-radius: 7px;
+}
+@media (max-width: 600px) {
+  .settings-actions {
+    flex-wrap: wrap;
+  }
+}

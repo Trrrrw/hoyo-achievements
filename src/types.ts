@@ -18,4 +18,9 @@ export type Achievement = {
   previous_id: string | null;
 };
 export type Group = { id: string; name: string; order: number; total: number };
-export type Catalog = { items: Achievement[]; groups: Group[] };
+export type Catalog = {
+  items: Achievement[];
+  groups: Group[];
+  savedAt?: number;
+  offline?: boolean;
+};

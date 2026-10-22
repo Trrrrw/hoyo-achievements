@@ -1,3 +1,4 @@
+import { CatalogNetworkError, withOfflineCatalog } from "./offline-catalog";
 import type { Catalog, Game, Achievement, Group } from "./types";
 import { visibleCatalog } from "./catalog-visibility";
 const base = (
@@ -5,16 +6,23 @@ const base = (
   (import.meta.env.DEV ? "" : "https://akasha.trrw.cn")
 ).replace(/\/$/, "");
 async function get<T>(path: string, signal: AbortSignal): Promise<T> {
-  const response = await fetch(`${base}/api/v1${path}`, {
-    signal: AbortSignal.any([signal, AbortSignal.timeout(30000)]),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${base}/api/v1${path}`, {
+      signal: AbortSignal.any([signal, AbortSignal.timeout(30000)]),
+    });
+  } catch (error) {
+    if (
+      error instanceof TypeError ||
+      (error instanceof DOMException && error.name === "TimeoutError")
+    )
+      throw new CatalogNetworkError("网络不可用，尚未缓存此游戏目录");
+    throw error;
+  }
   if (!response.ok) throw new Error(`Akasha 请求失败（${response.status}）`);
   return response.json() as Promise<T>;
 }
-export async function getCatalog(
-  game: Game,
-  signal: AbortSignal,
-): Promise<Catalog> {
+async function loadCatalog(game: Game, signal: AbortSignal): Promise<Catalog> {
   const groups = await get<{ items: Group[] }>(
     `/games/${game}/achievement-groups`,
     signal,
@@ -47,4 +55,8 @@ export async function getCatalog(
   )
     throw new Error("目录正在更新，请重新加载");
   return visibleCatalog(game, { items, groups: groups.items });
+}
+
+export function getCatalog(game: Game, signal: AbortSignal): Promise<Catalog> {
+  return withOfflineCatalog(game, () => loadCatalog(game, signal));
 }

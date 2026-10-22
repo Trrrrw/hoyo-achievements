@@ -1,0 +1,27 @@
+# 米游成就
+
+> 原神、崩坏：星穹铁道与绝区零的成就手册，提供目录检索、多阶段成就管理、进度导入导出、可选同步和 PWA 离线使用
+
+本站地址为 https://ach.trrw.cn，无需注册网站账号。游戏目录只从 Akasha 公开 API 读取，游戏标识为 ys（原神）、sr（崩坏：星穹铁道）、zzz（绝区零）
+
+个人完成状态和日期保存在用户当前浏览器中，不存放在 Akasha，也没有可供爬虫读取的公开玩家进度页面。读取公开目录不能用于判断用户已经完成哪些成就
+
+多阶段成就按前置关系合并展示，每个阶段仍使用独立的原始游戏 ID。总进度按阶段计数，清单按合并后的成就计数；部分阶段完成的成就仍属于未完成
+
+原神支持导入 UIAF v1.0 / v1.1、导出 v1.1；全部游戏备份使用本站 JSON 格式。导入仅更新文件中列出的记录，不清除缺失记录。未知完成日期保持未知，不能用识别截图或导入当天替代实际完成日期
+
+可选同步渠道为 WebDAV、GitHub Gist 和本地文件合并。同步操作需要用户选择并配置渠道，导出文件不包含同步凭据。秘密 Gist 可被持有链接的人读取。直接写入本地文件需要浏览器支持及用户授权
+
+PWA 支持安装和离线操作已加载的游戏目录；首次加载目录及远端同步需要联网。清除浏览器站点数据会清除本机进度，建议用户定期导出备份
+
+## 使用与数据
+
+- [成就手册](https://ach.trrw.cn/): 成就目录、搜索、完成状态管理、导入导出及同步入口
+- [网站说明](https://raw.githubusercontent.com/Trrrrw/hoyo-achievements/main/README.md): 功能、数据格式、同步要求、PWA 和使用边界
+- [Akasha OpenAPI](https://akasha.trrw.cn/openapi.json): 公开游戏目录 API 的路径、参数、响应及分页契约
+- [UIAF 标准](https://uigf.org/zh/standards/uiaf.html): 原神成就交换格式及状态、时间戳约定
+
+## Optional
+
+- [Akasha Agent Skills 安装说明](https://raw.githubusercontent.com/Trrrrw/Akasha/main/skills/README.md): 公开 Agent Skills 的安装入口与边界
+- [网站源码](https://github.com/Trrrrw/hoyo-achievements): React、Vite 和自定义冒险手册界面
